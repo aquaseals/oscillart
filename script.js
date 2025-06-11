@@ -1,4 +1,6 @@
 const input = document.getElementById('input')
+const colorPicker = document.getElementById('color')
+const volume = document.getElementById("volume")
 
 const audioCtx = new AudioContext()
 const gainNode = audioCtx.createGain()
@@ -25,7 +27,6 @@ var ctx = canvas.getContext('2d')
 var width = ctx.canvas.width
 var height = ctx.canvas.height
 
-var amplitude = 40
 var counter = 0
 var interval = null
 
@@ -35,14 +36,21 @@ var length = 0
 
 function frequency(pitch) {
     freq = pitch / 10000
-    gainNode.gain.setValueAtTime(100, audioCtx.currentTime)
+    gainNode.gain.setValueAtTime(volume.value, audioCtx.currentTime)
+    setting = setInterval(() => {
+        gainNode.gain.value = volume.value
+    }, 1)
     oscillator.frequency.setValueAtTime(pitch, audioCtx.currentTime)
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime+((timePerNote/1000)-0.1))
+    setTimeout(() => {
+        clearInterval(setting)
+        gainNode.gain.value = 0
+    }, ((timePerNote)-10))
 }
 
 function line() {
-    y = height/2 + (amplitude * Math.sin(x * 2 * Math.PI * freq * 0.5 * length))
+    y = height/2 + volume.value * Math.sin(x * 2 * Math.PI * freq * 0.5 * length)
     ctx.lineTo(x, y)
+    ctx.strokeStyle = colorPicker.value
     ctx.stroke()
     x += 1
     counter++
@@ -93,3 +101,60 @@ function handle() {
 
 }
 
+keyboard = new Map()
+keyboard.set("q", 130.81)
+keyboard.set("w", 146.83)
+keyboard.set("e", 164.81)
+keyboard.set("r", 174.61)
+keyboard.set("t", 196)
+keyboard.set("y", 220)
+keyboard.set("u", 246.94)
+keyboard.set("i", notenames.get("C"))
+keyboard.set("o", notenames.get("D"))
+keyboard.set("p", notenames.get("E"))
+keyboard.set("z", notenames.get("F"))
+keyboard.set("x", notenames.get("G"))
+keyboard.set("c", notenames.get("A"))
+keyboard.set("v", notenames.get("B"))
+keyboard.set("b", 523.25)
+keyboard.set("n", 587.33)
+keyboard.set("m", 659.25)
+keyboard.set(",", 698.46)
+keyboard.set(".", 783.99)
+keyboard.set("/", 880)
+keyboard.set("\'", 987.77)
+keyboard.set("2", 138.59)
+keyboard.set("3", 155.56)
+keyboard.set("4", 185)
+keyboard.set("5", 207.65)
+keyboard.set("6", 233.08)
+keyboard.set("7", 277.18)
+keyboard.set("8", 311.13)
+keyboard.set("9", 369.99)
+keyboard.set("0", 415.3)
+keyboard.set("s", 466.16)
+keyboard.set("d", 554.37)
+keyboard.set("f", 622.25)
+keyboard.set("h", 739.99)
+keyboard.set("j", 830.61)
+keyboard.set("l", 932.33)
+
+function record() {
+    document.addEventListener('keypress', handleRecord)
+}
+
+function handleRecord(key) {
+ audioCtx.resume()
+ let k = String(key.key)
+ let f = keyboard.get(k)
+ if (f > 0) {
+    console.log(f)
+    gainNode.gain.setValueAtTime(100, audioCtx.currentTime)
+    oscillator.frequency.setValueAtTime(f, audioCtx.currentTime)
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime+0.7)
+ }
+}
+
+function stopRecord() {
+ document.removeEventListener('keypress', handleRecord)
+}

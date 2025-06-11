@@ -12,11 +12,21 @@
 
     <button id="submit" onclick="handle()">Submit</button>
 
+    <input type="color" id="color" value="#ff0000">
+    
+    <input type="range" min="1" max="100" value="100" id="volume">
+
+    <button id="record" onclick="record()">Start Recording</button>
+
+    <button onclick="stopRecord()">Stop Recording</button>
+
     <div id="container">
         <canvas id="canvas">
 
         </canvas>
     </div>
+
+    <img src="./keyboard.png" alt="keyboard">
 
     <script src="script.js"></script>
   </body>
