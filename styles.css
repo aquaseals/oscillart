@@ -4,3 +4,8 @@
     width: 900px;
     margin-bottom: 2em;
 }
+
+div {
+    display: flex;
+    flex-direction: row;
+}

@@ -13,6 +13,12 @@ oscillator.type = "sine"
 oscillator.start()
 gainNode.gain.value = 0
 
+let song = []
+let isRecording = false
+let x = 0
+let y = height/2
+let freq = 0
+
 notenames = new Map()
 notenames.set("C", 261.6)
 notenames.set("D", 293.7)
@@ -47,10 +53,19 @@ function frequency(pitch) {
     }, ((timePerNote)-10))
 }
 
+
+
+function decimalToHexColor(decimal) {
+  decimal = Math.max(0, Math.min(decimal, 16777215));
+
+  let hex = decimal.toString(16).padStart(6, '0');
+
+  return `#${hex}`;
+}
+
 function line() {
     y = height/2 + volume.value * Math.sin(x * 2 * Math.PI * freq * 0.5 * length)
     ctx.lineTo(x, y)
-    ctx.strokeStyle = colorPicker.value
     ctx.stroke()
     x += 1
     counter++
@@ -61,24 +76,53 @@ function line() {
 
 function drawWave() {
     clearInterval(interval)
-    if (reset) {
+    if (reset && !isRecording) {
         ctx.clearRect(0, 0, width, height)
         x = 0
         y = height/2
         ctx.moveTo(x, y)
         ctx.beginPath()
+    } else if (reset) {
+        y = height/2
+        ctx.moveTo(x, y)
     }
+
     counter = 0
-    interval = setInterval(line, 20)
+    interval = setInterval(function() {
+    if (document.getElementById('customColor').checked) {
+        ctx.strokeStyle = decimalToHexColor(freq*1000000)
+    } else {
+        ctx.strokeStyle = colorPicker.value
+    }
+    line()
+    }, 20)
     reset = false
 }
 
-function handle() {
+function handle(song) {
+    ctx.clearRect(0, 0, width, height);
+    y = height/2
     reset = true
     audioCtx.resume()
     gainNode.gain.value = 0
 
-    userInput = String(input.value).toUpperCase()
+    if (song.length > 0) {
+        length = song.length
+        timePerNote = (6000/length)
+
+        let j = 0
+        repeat = setInterval(() => {
+            if (j < song.length) {
+                frequency(parseInt(song[j]))
+                drawWave()
+                j++
+            } else {
+                clearInterval(repeat)
+            }
+
+        }, timePerNote)
+    } else {
+        userInput = String(input.value).toUpperCase()
     let noteList = []
     length = userInput.length
     timePerNote = (6000/length)
@@ -98,6 +142,7 @@ function handle() {
         }
 
     }, timePerNote)
+    }
 
 }
 
@@ -140,7 +185,15 @@ keyboard.set("j", 830.61)
 keyboard.set("l", 932.33)
 
 function record() {
+    alert('started recording: you can now draw one note at a time using the keyboard/piano key map below DONT FORGET TO STOP WHEN DONE!!')
     document.addEventListener('keypress', handleRecord)
+    song = []
+    isRecording = true
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    x = 0
+    y = height/2
+    ctx.moveTo(0, height/2);
 }
 
 function handleRecord(key) {
@@ -149,12 +202,46 @@ function handleRecord(key) {
  let f = keyboard.get(k)
  if (f > 0) {
     console.log(f)
+    song.push(String(f))
     gainNode.gain.setValueAtTime(100, audioCtx.currentTime)
     oscillator.frequency.setValueAtTime(f, audioCtx.currentTime)
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime+0.7)
+    freq = f / 10000
+    counter =0
+    reset = false
+    drawOneWave([f])
  }
+}
+
+function drawOneWave(song) {
+    y = height/2
+    reset = false
+    audioCtx.resume()
+    gainNode.gain.value = 0
+
+        length = 1
+        timePerNote = 500
+
+        let j = 0
+        repeat = setInterval(() => {
+            if (j < song.length) {
+                gainNode.gain.setValueAtTime(100, audioCtx.currentTime)
+                oscillator.frequency.setValueAtTime(parseInt(song[j]), audioCtx.currentTime)
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime+0.7)
+                freq = parseInt(song[j]) / 10000
+                drawWave()
+                j++
+            } else {
+                clearInterval(repeat)
+            }
+
+        }, timePerNote)
 }
 
 function stopRecord() {
  document.removeEventListener('keypress', handleRecord)
+ console.log(song)
+ isRecording = false
+ ctx.clearRect(0, 0, width, height);
+ alert('stopped recording: your keyboard keys will no longer act as piano keys, feel free to record again or type out a full meoldy in the input!')
 }
