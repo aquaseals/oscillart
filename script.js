@@ -1,3 +1,5 @@
+// completed on: june 11 2025 by haya :P
+
 const input = document.getElementById('input')
 const colorPicker = document.getElementById('color')
 const volume = document.getElementById("volume")
@@ -57,8 +59,6 @@ function frequency(pitch) {
     }, ((timePerNote)-10))
 }
 
-
-
 function decimalToHexColor(decimal) {
   decimal = Math.max(0, Math.min(decimal, 16777215));
 
@@ -93,6 +93,7 @@ function drawWave() {
 
     counter = 0
     interval = setInterval(function() {
+        // extra custom feature, party mode to change color as it draws melodies
     if (document.getElementById('customColor').checked) {
         ctx.strokeStyle = decimalToHexColor(freq*1000000)
     } else {
@@ -110,6 +111,7 @@ function handle(song) {
     audioCtx.resume()
     gainNode.gain.value = 0
 
+    // from this line to 129 is irrelvant (was a separate sidequest)
     if (song.length > 0) {
         length = song.length
         timePerNote = (6000/length)
@@ -150,7 +152,9 @@ function handle(song) {
 
 }
 
-keyboard = new Map()
+// custom feature: piano that draws each note as a sine wave and plays the note as you press keys. can be activated or deactivated
+
+keyboard = new Map() // a lot of keys if you couldn't tell
 keyboard.set("q", 130.81)
 keyboard.set("w", 146.83)
 keyboard.set("e", 164.81)
@@ -223,8 +227,8 @@ function drawOneWave(song) {
     audioCtx.resume()
     gainNode.gain.value = 0
 
-        length = 1
-        timePerNote = 500
+        length = 1 // only one note
+        timePerNote = 500 // sets a fix time per note bc its only paying 1 note at a time while piano is activated, so it needs to make space for more possible notes
 
         let j = 0
         repeat = setInterval(() => {
@@ -250,6 +254,8 @@ function stopRecord() {
  alert('piano deactivated: your keyboard keys will no longer act as piano keys, feel free to record again or type out a full melody in the input!')
 }
 
+
+// recording canvas
 function recordVideo() {
     const canvasStream = canvas.captureStream(20)
 
@@ -258,7 +264,6 @@ function recordVideo() {
     gainNode.connect(audioDestination)
 
     const combinedStream = new MediaStream()
-
 
     canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
 
@@ -272,7 +277,6 @@ function recordVideo() {
     }
     };
     
-
     recorder.onstop = () => {
     const blob = new Blob(chunks, { type: 'video/webm' });
     const url = URL.createObjectURL(blob);
