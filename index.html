@@ -8,28 +8,48 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <input type="text" id="input">
 
-    <button id="submit" onclick="handle([])">Submit</button>
-
-    <input type="color" id="color" value="#ff0000">
-    
-    <input type="range" min="1" max="100" value="100" id="volume">
-
-    <button id="record" onclick="record()">Start Recording</button>
-
-    <button onclick="stopRecord()">Stop Recording</button>
-
+    <h1>Oscillart YSWS by haya</h1>
+     
     <div>
-    <p>party mode?</p>
-    <input type="checkbox" id="customColor">
-    </div>
-
-    <div id="container">
+      <div id="container">
         <canvas id="canvas">
 
         </canvas>
+
     </div>
+
+    <div style="flex-direction: column; margin-top: 100px;">
+            <div>
+        <input type="text" id="input">
+
+        <button id="submit" onclick="handle([])">Submit</button>
+      
+        
+      
+        <input type="color" id="color" value="#ff0000">
+    
+        <div style="background-color: white;">
+            <input type="range" min="1" max="100" value="100" id="volume">
+        </div>
+      
+      </div>
+        <div>
+<button id="record" onclick="record()">Activate Piano</button>
+  
+      <button onclick="stopRecord()">Deactivate Piano</button>
+
+        <p>party mode?</p> 
+        <input type="checkbox" id="customColor">
+      </div>
+    
+    
+
+    <button id="toggle" onclick="toggle()">Start Recording Video</button>
+
+    </div>
+    </div>
+
 
     <img src="./keyboard.png" alt="keyboard">
 

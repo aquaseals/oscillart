@@ -1,11 +1,52 @@
 #canvas {
-    border: 5px solid black;
-    height: 500px;
-    width: 900px;
+    border: 5px solid white;
+    height: 60vh;
+    width: 52vw;
     margin-bottom: 2em;
+}
+
+h1 {
+    text-align: center;
+}
+
+h1, p {
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+p {
+    font-size: 30px;
+    margin-left: 10px;
+}
+
+body {
+    background-image: linear-gradient( rgb(10, 91, 111), rgb(56, 171, 157));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+canvas {
+    background-color: white;
+}
+
+button, input {
+    width: 10vw;
+    margin: 10px;
+    height: 4vw;
+    border-color: white;
+    border-radius: 10px;
+}
+
+button:hover, input:hover {
+    cursor: pointer;
 }
 
 div {
     display: flex;
     flex-direction: row;
+}
+
+#toggle {
+    margin: auto;
 }

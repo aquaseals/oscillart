@@ -1,6 +1,7 @@
 const input = document.getElementById('input')
 const colorPicker = document.getElementById('color')
 const volume = document.getElementById("volume")
+const recordingToggle = document.getElementById("toggle")
 
 const audioCtx = new AudioContext()
 const gainNode = audioCtx.createGain()
@@ -18,6 +19,9 @@ let isRecording = false
 let x = 0
 let y = height/2
 let freq = 0
+
+var blob, recorder = null
+var chunks = []
 
 notenames = new Map()
 notenames.set("C", 261.6)
@@ -185,7 +189,7 @@ keyboard.set("j", 830.61)
 keyboard.set("l", 932.33)
 
 function record() {
-    alert('started recording: you can now draw one note at a time using the keyboard/piano key map below DONT FORGET TO STOP WHEN DONE!!')
+    alert('piano activated: you can now draw one note at a time using the keyboard/piano key map below DONT FORGET TO STOP WHEN DONE!!')
     document.addEventListener('keypress', handleRecord)
     song = []
     isRecording = true
@@ -243,5 +247,54 @@ function stopRecord() {
  console.log(song)
  isRecording = false
  ctx.clearRect(0, 0, width, height);
- alert('stopped recording: your keyboard keys will no longer act as piano keys, feel free to record again or type out a full meoldy in the input!')
+ alert('piano deactivated: your keyboard keys will no longer act as piano keys, feel free to record again or type out a full melody in the input!')
+}
+
+function recordVideo() {
+    const canvasStream = canvas.captureStream(20)
+
+    const audioDestination  = audioCtx.createMediaStreamDestination()
+
+    gainNode.connect(audioDestination)
+
+    const combinedStream = new MediaStream()
+
+
+    canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+
+    audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track))
+
+    recorder = new MediaRecorder(combinedStream, {mimeType: 'video/webm'})
+
+    recorder.ondataavailable = e => {
+    if (e.data.size > 0) {
+    chunks.push(e.data);
+    }
+    };
+    
+
+    recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'recording.webm';
+    a.click();
+    URL.revokeObjectURL(url);
+    };
+
+    recorder.start()
+}
+
+var isRecordingVideo = false
+function toggle() {
+    isRecordingVideo = !isRecordingVideo
+    if (isRecordingVideo) {
+        chunks = []
+        recordingToggle.innerHTML = "Stop Recording Video"
+        recordVideo()
+    } else {
+        recordingToggle.innerHTML = "Start Recording Video"
+        recorder.stop()
+    }
 }
